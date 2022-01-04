@@ -8,7 +8,6 @@ import datetime
 from typing import Union
 import json
 import websocket
-import pandas as pd
 
 class FivePaisaClient:
 
@@ -400,55 +399,55 @@ class FivePaisaClient:
         
         return response['body']['Message']
 
-    def historical_data(self,Exch:str,ExchangeSegment:str,ScripCode: int,time: str,From:str,To: str):
-        validation=self.jwt_validate()
-        
-        
-        if validation=='Authorization Successful':
-            self.jwt_headers['x-clientcode']=self.client_code
-            self.jwt_headers['x-auth-token']=self.Jwt_token
-            url=f'{self.HISTORICAL_DATA_ROUTE}{Exch}/{ExchangeSegment}/{ScripCode}/{time}?from={From}&end={To}'
-            timeList=['1m','5m','10m','15m','30m','60m','1d']
-            if time not in timeList:
-                return 'Invalid Time Frame. it should be within [1m,5m,10m,15m,30m,60m,1d].'
-            else:
-                
-                
-                response = self.session.get(url, headers=self.jwt_headers).json()
-                candleList=response['data']['candles']
-                
-                df=pd.DataFrame(candleList)
-        
-                df.columns=['Datetime','Open','High','Low','Close','Volume']
-        
-                return df
-        
-        else:
-            return 'Invalid JWT.'
+    # def historical_data(self,Exch:str,ExchangeSegment:str,ScripCode: int,time: str,From:str,To: str):
+    #     validation=self.jwt_validate()
+    #
+    #
+    #     if validation=='Authorization Successful':
+    #         self.jwt_headers['x-clientcode']=self.client_code
+    #         self.jwt_headers['x-auth-token']=self.Jwt_token
+    #         url=f'{self.HISTORICAL_DATA_ROUTE}{Exch}/{ExchangeSegment}/{ScripCode}/{time}?from={From}&end={To}'
+    #         timeList=['1m','5m','10m','15m','30m','60m','1d']
+    #         if time not in timeList:
+    #             return 'Invalid Time Frame. it should be within [1m,5m,10m,15m,30m,60m,1d].'
+    #         else:
+    #
+    #
+    #             response = self.session.get(url, headers=self.jwt_headers).json()
+    #             candleList=response['data']['candles']
+    #
+    #             df=pd.DataFrame(candleList)
+    #
+    #             df.columns=['Datetime','Open','High','Low','Close','Volume']
+    #
+    #             return df
+    #
+    #     else:
+    #         return 'Invalid JWT.'
 
-    def get_buy(self):
-        res=self._user_info_request("IB")
-        if len(res) > 0:
-            message = res[0]["payload"]
-            res1 = json.loads(message)
-            with pd.option_context('display.max_columns',None,'display.max_rows',None):
-                df=pd.DataFrame(res1)
-            return df
-        else:
-            message ="You don't have an active Ultra-Trader-Pack. Please subscribe to it to avail the services."
-            return message
-
-    def get_trade(self):
-        res=self._user_info_request("IT")
-        if len(res) > 0:
-            message = res[1]["payload"]
-            res1 = json.loads(message)
-            with pd.option_context('display.max_columns',None,'display.max_rows',None):
-                df=pd.DataFrame(res1)
-            return df
-        else:
-            message ="You don't have an active Ultra-Trader-Pack. Please subscribe to it to avail the services."
-            return message
+    # def get_buy(self):
+    #     res=self._user_info_request("IB")
+    #     if len(res) > 0:
+    #         message = res[0]["payload"]
+    #         res1 = json.loads(message)
+    #         with pd.option_context('display.max_columns',None,'display.max_rows',None):
+    #             df=pd.DataFrame(res1)
+    #         return df
+    #     else:
+    #         message ="You don't have an active Ultra-Trader-Pack. Please subscribe to it to avail the services."
+    #         return message
+    #
+    # def get_trade(self):
+    #     res=self._user_info_request("IT")
+    #     if len(res) > 0:
+    #         message = res[1]["payload"]
+    #         res1 = json.loads(message)
+    #         with pd.option_context('display.max_columns',None,'display.max_rows',None):
+    #             df=pd.DataFrame(res1)
+    #         return df
+    #     else:
+    #         message ="You don't have an active Ultra-Trader-Pack. Please subscribe to it to avail the services."
+    #         return message
 
 
     def get_tradebook(self):
